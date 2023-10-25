@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vocdoni-node-0
+spec:
+  serviceName: "vocdoni-node-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vocdoni-node-0
+  template:
+    metadata:
+      labels:
+        app: vocdoni-node-0
+        vocdoni: node
+    spec:
+      containers:
+      - name: vocdoni-node
+        image: ghcr.io/vocdoni/vocdoni-node:release-lts-1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: vocdoni-env
+        env:
+        - name: VOCDONI_VOCHAIN_MINERKEY
+          valueFrom:
+            secretKeyRef:
+              name: vocdoni-signing-key
+              key: signing-key
+        - name: VOCDONI_VOCHAIN_PUBLICADDR
+          valueFrom:
+            secretKeyRef:
+              name: vocdoni-node-ip
+              key: public-ip
+        ports:
+        - containerPort: 9090
+        - containerPort: 26656
+        - containerPort: 26657
+        - containerPort: 26658
+        volumeMounts:
+        - name: vocdoni-node-pvc-0
+          mountPath: /app/run
+      volumes:
+      - name: vocdoni-node-pvc-0
+        persistentVolumeClaim:
+          claimName: vocdoni-node-pvc-0
+  volumeClaimTemplates:
+  - metadata:
+      name: vocdoni-node-pvc-0
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 80Gi
+
