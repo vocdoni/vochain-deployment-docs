@@ -33,3 +33,13 @@ For triggering a restart of the service preserving data store (i.e to force upda
 For making a full reset of the service and its data (permanent loss): `./manage.sh full-reset`
 
 You can get the external IP of the service with: `./manage.sh ip`
+
+---
+
+At this point **if you want your node to become validator**, you need to extract the 
+public key from the logs: 
+
+`docker compose logs  vocdoninode | grep publicKey`.
+
+Provide the public key and a fancy name to the Vocdoni team so they can upgrade your node to validator.
+
